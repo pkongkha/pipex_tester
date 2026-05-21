@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 # bonus info config (CHANGE HERE if your bonus exec/rule is not 'pipex')
 pipex_bonus=pipex
@@ -21,7 +21,7 @@ bin_path=/usr/bin
 uname -s | grep -qi darwin && os=mac && ls_path=/bin && cat_path=/bin
 uname -s | grep -qi linux && os=linux && cat_path=/usr/bin && ls_path=/usr/bin
 
-# mac os : timeout command install via homebrew 
+# mac os : timeout command install via homebrew
 if [[ $os == "mac" && ! $(which timeout) ]] ; then
 echo -e "Missing command 'timeout' on mac os. Trying to install via homebrew ..."
 [[ ! $(which brew) ]] && echo "Missing homebrew (needed for timeout installation). Please install Homebrew and restarts the tester" && exit 1
@@ -60,11 +60,11 @@ else
 	echo -e "${GREEN} norm ok${END}"
 fi
 
-#makefile 
+#makefile
 echo -ne "${BLU_BG}Test Makefile:${END} \t\t\t\t\t\t\t\t-->"
 make re 1>/dev/null 2> stderrmake.txt
 make > stdoutmakebis.txt 2>&1
-[[ -s stderrmake.txt ]] && echo -ne "${RED} make wrote on std err${END}" || echo -ne "${GREEN} no make error${END}" 
+[[ -s stderrmake.txt ]] && echo -ne "${RED} make wrote on std err${END}" || echo -ne "${GREEN} no make error${END}"
 echo -n " -- "
 cat stdoutmakebis.txt | egrep -viq "(nothin|already|date)" && echo -ne "${RED}makefile relink?${END}" || echo -ne "${GREEN}no relink${END}"
 echo -n " -- "
@@ -76,13 +76,13 @@ if [[ $bonus == 1 ]] ; then
 echo -ne "${BLU_BG}Test Makefile bonus:${END} \t\t\t\t\t\t\t-->"
 make ${rule_bonus} 1>/dev/null 2> stderrmake.txt
 make ${rule_bonus} > stdoutmakebis.txt 2>&1
-[[ -s stderrmake.txt ]] && echo -ne "${RED} make ${rule_bonus} wrote on std err${END}" || echo -ne "${GREEN} no make ${rule_bonus} error${END}" 
+[[ -s stderrmake.txt ]] && echo -ne "${RED} make ${rule_bonus} wrote on std err${END}" || echo -ne "${GREEN} no make ${rule_bonus} error${END}"
 echo -ne " -- "
 cat stdoutmakebis.txt | egrep -viq "(nothin|already|date)" && echo -ne "${RED}makefile relinks on bonus?${END}" || echo -ne "${GREEN}no relink on bonus${END}"
 echo -ne " -- "
 [[ -f $pipex_bonus && -x $pipex_bonus ]] && echo -e "${GREEN}exec named $pipex_bonus${END}" || echo -e "${RED}no exec file found named $pipex_bonus${END}"
 rm -rf stderrmake.txt stdoutmakebis.txt
-( make fclean && make ) >/dev/null 2>&1 
+( make fclean && make ) >/dev/null 2>&1
 fi
 
 [[ ! -f pipex ]] && { echo -e "${RED_BG}No file 'pipex'. Tester exiting.${END}" ; make fclean >/dev/null 2>&1 ; exit ; }
@@ -112,7 +112,7 @@ echo -e "\n${BLU_BG}Basics:${END}"
 
 echo -ne "Test 1 : ./pipex Makefile ls ls t1_output \t\t\t\t--> "
 touch t1_output t1_expected #both created here bc of ls cmd
-./pipex "Makefile" "ls" "ls" "t1_output" >/dev/null 2>&1 
+./pipex "Makefile" "ls" "ls" "t1_output" >/dev/null 2>&1
 code=$(echo $?)
 ls > t1_expected
 diff t1_expected t1_output >/dev/null 2>&1 && echo -ne "${GREEN}OK ${END}" || echo -ne "${RED} KO${END}"
@@ -121,7 +121,7 @@ rm -f t1_*
 
 echo -ne "Test 2 : ./pipex Makefile cat cat t2_output \t\t\t\t--> "
 touch t2_output
-./pipex "Makefile" "cat" "cat" "t2_output" >/dev/null 2>&1 
+./pipex "Makefile" "cat" "cat" "t2_output" >/dev/null 2>&1
 code=$(echo $?)
 diff Makefile t2_output >/dev/null 2>&1 && echo -ne "${GREEN}OK ${END}" || echo -ne "${RED}KO ${END}"
 [[ $code -eq 0 ]] && echo -e "${GREEN}(return status == 0)${END}" || echo -e "${YEL}(return status != 0)${END}"
@@ -129,19 +129,19 @@ rm -f t2_*
 
 echo -ne "Test 3 : ./pipex Makefile \"cat -e\" \"head -n3\" t3_output\t\t\t--> "
 touch t3_output t3_expected
-./pipex "Makefile" "cat -e" "head -n3" "t3_output" >/dev/null 2>&1 
+./pipex "Makefile" "cat -e" "head -n3" "t3_output" >/dev/null 2>&1
 code=$(echo $?)
 cat -e Makefile | head -n3 > t3_expected
 diff t3_expected t3_output >/dev/null 2>&1 && echo -ne "${GREEN}OK ${END}" || echo -ne "${RED}KO (cmd one after another instead of parallel) ${END}"
 [[ $code -eq 0 ]] && echo -e "${GREEN}(return status == 0)${END}" || echo -e "${YEL}(return status != 0)${END}"
-rm -f t3_* 
+rm -f t3_*
 
 #cmd with absolute path
 echo -e "${BLU_BG}Absolut path cmd:${END}"
 
 echo -ne "Test 1 : ./pipex Makefile ${ls_path}/ls ${bin_path}/cat t1_output \t\t\t--> "
 touch t1_output t1_expected
-./pipex "Makefile" "${ls_path}/ls" "${cat_path}/cat" "t1_output" >/dev/null 2>&1 
+./pipex "Makefile" "${ls_path}/ls" "${cat_path}/cat" "t1_output" >/dev/null 2>&1
 code=$(echo $?)
 ${ls_path}/ls < Makefile | ${cat_path}/cat > t1_expected 2>/dev/null
 diff t1_expected t1_output >/dev/null 2>&1 && echo -ne "${GREEN}OK ${END}" || echo -ne "${RED}KO ${END}"
@@ -150,7 +150,7 @@ rm -f t1_*
 
 echo -ne "Test 2 : ./pipex Makefile \"${bin_path}/tail -n15\" \"${bin_path}/head -n6\" t1_output\t--> "
 touch t1_output t1_expected
-./pipex "Makefile" "${bin_path}/tail -n15" "${bin_path}/head -n6" "t1_output" >/dev/null 2>&1 
+./pipex "Makefile" "${bin_path}/tail -n15" "${bin_path}/head -n6" "t1_output" >/dev/null 2>&1
 code=$(echo $?)
 ${bin_path}/tail -n15 < Makefile | ${bin_path}/head -n6 > t1_expected 2>/dev/null
 diff t1_expected t1_output >/dev/null 2>&1 && echo -ne "${GREEN}OK ${END}" || echo -ne "${RED}KO ${END}"
@@ -260,7 +260,7 @@ echo -e "${BLU_BG}Infile no readable:${END}"
 touch infile_r infile_no_r && chmod u-r infile_no_r
 
 echo -ne "Test 1 : ./pipex infile_r \"touch truc\" \"touch truc2\" t1_output\t\t--> "
-./pipex infile_r "touch truc" "touch truc2" t1_output >/dev/null 2>&1 
+./pipex infile_r "touch truc" "touch truc2" t1_output >/dev/null 2>&1
 code=$(echo $?)
 [[ $(ls -l | egrep -c "truc2?") -eq 2 ]] && echo -ne "${GREEN}OK. ${END}" || echo -ne "${RED}KO. ${END}"
 [[ $code -eq 0 ]] && echo -e "${GREEN}(return status == 0)${END}" || echo -e "${YEL}(return status != 0)${END}"
@@ -291,7 +291,7 @@ echo -e "${BLU_BG}Outfile no writable:${END}"
 touch outfile_w outfile_no_w && chmod u-w outfile_no_w
 
 echo -ne "Test 1 : ./pipex Makefile \"touch truc\" \"touch truc2\" outfile_w \t\t--> "
-./pipex Makefile "touch truc" "touch truc2" outfile_w >/dev/null 2>&1 
+./pipex Makefile "touch truc" "touch truc2" outfile_w >/dev/null 2>&1
 code=$(echo $?)
 [[ $(ls -l | egrep "truc2?" | wc -l) -eq 2 ]] && echo -ne "${GREEN}OK. ${END}" || echo -ne "${RED}KO. ${END}"
 [[ $code -eq 0 ]] && echo -e "${GREEN}(return status == 0)${END}" || echo -e "${YEL}(return status != 0)${END}"
@@ -315,7 +315,7 @@ code=$(echo $?)
 [[ -s stdout.txt ]] && echo -ne "${YEL}Stdout: unexpected output. ${END}"
 [[ $(cat stderr.txt stdout.txt 2>/dev/null | grep -i "permission denied") ]] && echo -ne "${GREEN}(err msg) ${END}" || echo -ne "${YEL}(err msg without \"Permission denied\") ${END}"
 [[ $code -eq 1 ]] && echo -e "${GREEN}(return status == 1)${END}" || echo -e "${YEL}(return status != 1)${END}"
-rm -f stderr.txt stdout.txt outfile* OUI 
+rm -f stderr.txt stdout.txt outfile* OUI
 
 # outfile created before executing ls
 echo -e "${BLU_BG}Outfile created before exec:${END}"
@@ -336,7 +336,7 @@ rm -f outf
 echo -e "${BLU_BG}Concurrency of cmds:${END}"
 
 echo -ne "Test 1 : ./pipex Makefile yes \"echo yo\" outf \t\t\t\t--> "
-timeout --preserve-status 2 ./pipex Makefile "yes" "echo yo" outf >/dev/null 2>&1 
+timeout --preserve-status 2 ./pipex Makefile "yes" "echo yo" outf >/dev/null 2>&1
 code=$(echo $?)
 [[ -f outf && $(cat outf) -eq "yo" ]] && echo -ne "${GREEN}OK ${END}" || echo -ne "${RED}KO ${END}"
 [[ $code -eq 0 ]] && echo -e "${GREEN}(return status == 0)${END}" || echo -e "${YEL}(return status != 0)${END}"
@@ -373,7 +373,7 @@ rm -f stderr.txt outf*
 # executable (+ pas les droits)
 echo -e "${BLU_BG}Custom exec:${END}"
 
-echo -e "#include <stdio.h>\nint main(void){printf(\"yo\");}" > main.c 
+echo -e "#include <stdio.h>\nint main(void){printf(\"yo\");}" > main.c
 mkdir -p dir1/dir2 ; gcc main.c ; gcc -o ls main.c ; gcc -o dir1/dir2/ls main.c
 rm main.c
 
@@ -470,7 +470,7 @@ main_proc=$(cat vlg.txt | grep -m3 -A 1 "HEAP SUMMARY" | tail -n1 | egrep -o "[0
 fd=$(cat vlg.txt | grep -o  "Open file descriptor [0-9]*:" | sort | uniq | wc -l | tr -d "[:blank:]")
 main_fd_open=$(cat vlg.txt | grep -m3 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* open" | egrep -o "[0-9]*")
 main_fd_std=$(cat vlg.txt | grep -m3 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* std" | egrep -o "[0-9]*")
-main_fd=$(( $main_fd_open - $main_fd_std ))
+main_fd=$(( main_fd_open - main_fd_std ))
 [[ $first_proc -eq 0 ]] && echo -ne "${GREEN}no leak cat${END}" || echo -ne "${RED}$first_proc leaks first cat${END}"
 [[ $second_proc -eq 0 ]] && echo -ne "${GREEN} - no leak cat${END}" || echo -ne "${RED} - $second_proc leaks second cat${END}"
 [[ $main_proc -eq 0 ]] && echo -ne "${GREEN} - no leak main${END}" || echo -ne "${RED} - $main_proc leaks main${END}"
@@ -486,7 +486,7 @@ main_proc=$(cat vlg.txt | grep -m3 -A 1 "HEAP SUMMARY" | tail -n1 | egrep -o "[0
 fd=$(cat vlg.txt | grep -o  "Open file descriptor [0-9]*:" | sort | uniq | wc -l | tr -d "[:blank:]")
 main_fd_open=$(cat vlg.txt | grep -m3 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* open" | egrep -o "[0-9]*")
 main_fd_std=$(cat vlg.txt | grep -m3 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* std" | egrep -o "[0-9]*")
-main_fd=$(( $main_fd_open - $main_fd_std ))
+main_fd=$(( main_fd_open - main_fd_std ))
 echo -ne "${GREEN}$first_proc leaks yes (it's ok)${END}"
 [[ $second_proc -eq 0 ]] && echo -ne "${GREEN} - no leak head${END}" || echo -ne "${RED} - $second_proc leaks head${END}"
 [[ $main_proc -eq 0 ]] && echo -ne "${GREEN} - no leak main${END}" || echo -ne "${RED} - $main_proc leaks main${END}"
@@ -502,7 +502,7 @@ main_proc=$(cat vlg.txt | grep -m3 -A 1 "HEAP SUMMARY" | tail -n1 | egrep -o "[0
 fd=$(cat vlg.txt | grep -o  "Open file descriptor [0-9]*:" | sort | uniq | wc -l | tr -d "[:blank:]")
 main_fd_open=$(cat vlg.txt | grep -m3 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* open" | egrep -o "[0-9]*")
 main_fd_std=$(cat vlg.txt | grep -m3 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* std" | egrep -o "[0-9]*")
-main_fd=$(( $main_fd_open - $main_fd_std ))
+main_fd=$(( main_fd_open - main_fd_std ))
 [[ $first_proc -eq 0 ]] && echo -ne "${GREEN}no leak cat${END}" || echo -ne "${RED}$second_proc leaks cat${END}"
 [[ $second_proc -eq 0 ]] && echo -ne "${GREEN} - no leak head${END}" || echo -ne "${RED} - $second_proc leaks head${END}"
 [[ $main_proc -eq 0 ]] && echo -ne "${GREEN} - no leak main${END}" || echo -ne "${RED} - $main_proc leaks main${END}"
@@ -519,7 +519,7 @@ main_proc=$(cat vlg.txt | grep -m3 -A 1 "HEAP SUMMARY" | tail -n1 | egrep -o "[0
 fd=$(cat vlg.txt | grep -o  "Open file descriptor [0-9]*:" | sort | uniq | wc -l | tr -d "[:blank:]")
 main_fd_open=$(cat vlg.txt | grep -m3 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* open" | egrep -o "[0-9]*")
 main_fd_std=$(cat vlg.txt | grep -m3 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* std" | egrep -o "[0-9]*")
-main_fd=$(( $main_fd_open - $main_fd_std ))
+main_fd=$(( main_fd_open - main_fd_std ))
 [[ $first_proc -eq 0 ]] && echo -ne "${GREEN}no leak cat${END}" || echo -ne "${RED}$first_proc leaks  cat${END}"
 [[ $second_proc -eq 0 ]] && echo -ne "${GREEN} - no leak echo${END}" || echo -ne "${RED} - $second_proc leaks echo${END}"
 [[ $main_proc -eq 0 ]] && echo -ne "${GREEN} - no leak main${END}" || echo -ne "${RED} - $main_proc leaks main${END}"
@@ -535,7 +535,7 @@ main_proc=$(cat vlg.txt | grep -m3 -A 1 "HEAP SUMMARY" | tail -n1 | egrep -o "[0
 fd=$(cat vlg.txt | grep -o  "Open file descriptor [0-9]*:" | sort | uniq | wc -l | tr -d "[:blank:]")
 main_fd_open=$(cat vlg.txt | grep -m3 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* open" | egrep -o "[0-9]*")
 main_fd_std=$(cat vlg.txt | grep -m3 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* std" | egrep -o "[0-9]*")
-main_fd=$(( $main_fd_open - $main_fd_std ))
+main_fd=$(( main_fd_open - main_fd_std ))
 [[ $first_proc -eq 0 ]] && echo -ne "${GREEN}no leak catiop${END}" || echo -ne "${RED}$first_proc leaks  catiop${END}"
 [[ $second_proc -eq 0 ]] && echo -ne "${GREEN} - no leak empty cmd${END}" || echo -ne "${RED} - $second_proc leaks empty cmd${END}"
 [[ $main_proc -eq 0 ]] && echo -ne "${GREEN} - no leak main${END}" || echo -ne "${RED} - $main_proc leaks main${END}"
@@ -553,7 +553,7 @@ main_proc=$(cat vlg.txt | grep -m3 -A 1 "HEAP SUMMARY" | tail -n1 | egrep -o "[0
 fd=$(cat vlg.txt | grep -o  "Open file descriptor [0-9]*:" | sort | uniq | wc -l | tr -d "[:blank:]")
 main_fd_open=$(cat vlg.txt | grep -m3 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* open" | egrep -o "[0-9]*")
 main_fd_std=$(cat vlg.txt | grep -m3 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* std" | egrep -o "[0-9]*")
-main_fd=$(( $main_fd_open - $main_fd_std ))
+main_fd=$(( main_fd_open - main_fd_std ))
 [[ $first_proc -eq 0 ]] && echo -ne "${GREEN}no leak a.out${END}" || echo -ne "${RED}$first_proc leaks a.out${END}"
 [[ $second_proc -eq 0 ]] && echo -ne "${GREEN} - no leak echo${END}" || echo -ne "${RED} - $second_proc leaks echo${END}"
 [[ $main_proc -eq 0 ]] && echo -ne "${GREEN} - no leak main${END}" || echo -ne "${RED} - $main_proc leaks main${END}"
@@ -563,11 +563,11 @@ rm -f outf a.out vlg.txt
 
 fi
 
-# process and zombies 
-: << END_COMMENT 
+# process and zombies
+: << END_COMMENT
 Zombies only exists while child has returned and parent has not. As soon as parent returned,
 child is adopted by the 'init' process (pid 1), collecting its status and removing it from process table.
-We can find zombie with : 
+We can find zombie with :
 	-> ps -e (or a|u|x) looking for <defunct> or Z+ in stat column
 	-> top -bn1 looking for zombie nb on the second line, or Z in stat
 we'll use second line of top. First check the nb, do the test, recheck the nb before pipex returned : if increased then pipex creates zombie
@@ -579,8 +579,6 @@ END_COMMENT
 
 echo -e "${BLU_BG}Zombies (children process not waited by pipex):${END}"
 rm -rf *top_result zombies_test*
-
-gcc -o popo popo.c
 
 echo -ne "Test 1 : ./pipex Makefile \"sleep 3\" \"sleep 1\" outf \t\t\t--> "
 start_Z_nb=$(top -bn1 | head -n2 | egrep -o "[0-9]* zombie$" | egrep -o "[0-9]*")
@@ -596,12 +594,12 @@ rm -f outf
 echo -ne "Test 2 : ./pipex Makefile \"sleep 1\" \"sleep 3\" outf \t\t\t--> "
 start_Z_nb=$(top -bn1 | head -n2 | egrep -o "[0-9]* zombie$" | egrep -o "[0-9]*")
 ./pipex Makefile "sleep 1" "sleep 3" outf &
-sleep 1 
+sleep 1
 exec_Z_nb=$(top -bn1 | head -n2 | egrep -o "[0-9]* zombie$" | egrep -o "[0-9]*")
 ps -aux | grep Z | grep -vi grep > zombie_test2
 kill -s SIGTERM $! > /dev/null 2>&1 || kill -s SIGKILL $! > /dev/null 2>&1
 [[ $(( $exec_Z_nb - $start_Z_nb )) -eq 0 ]] && echo -e "${GREEN}OK (sleep 1 did not became a zombie)${END}" && rm -f zombie_test2
-[[ $(( $exec_Z_nb - $start_Z_nb )) -gt 0 ]] && echo -e "${YEL}KO: $(( $exec_Z_nb - $start_Z_nb )) process became a zombie before pipex returned (most probably sleep 1, please check 'zombie_test2')${END}"
+[[ $(( $exec_Z_nb - $start_Z_nb )) -gt 0 ]] && echo -e "${YEL}KO: $(( exec_Z_nb - start_Z_nb )) process became a zombie before pipex returned (most probably sleep 1, please check 'zombie_test2')${END}"
 rm -f outf
 
 echo -ne "Test 3 : ./pipex bad_infile ls \"sleep 2\" outf \t\t\t\t--> "
@@ -617,7 +615,7 @@ rm -f outf
 
 echo -ne "Test 4 : ./pipex Makefile bad_cmd \"sleep 1\" outf \t\t\t--> "
 start_Z_nb=$(top -bn1 | head -n2 | egrep -o "[0-9]* zombie$" | egrep -o "[0-9]*")
-./pipex Makefile bad_cmd "sleep 1" outf > /dev/null 2>&1 & 
+./pipex Makefile bad_cmd "sleep 1" outf > /dev/null 2>&1 &
 exec_Z_nb=$(top -bn1 | head -n2 | egrep -o "[0-9]* zombie$" | egrep -o "[0-9]*")
 ps -aux | grep Z | grep -vi grep > zombie_test4
 kill -s SIGTERM $! > /dev/null 2>&1 || kill -s SIGKILL $! > /dev/null 2>&1
@@ -627,11 +625,11 @@ rm -f outf
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------------
-# BONUS TESTS : 
+# BONUS TESTS :
 # -----------------------------------------------------------------------------------------------------------------------------------------
 if [[ ! $1 =~ -m$|-mandatory$ ]] ; then
 
-[[ $bonus -eq 1 ]] && make ${rule_bonus} >/dev/null 2>&1 
+[[ $bonus -eq 1 ]] && make ${rule_bonus} >/dev/null 2>&1
 
 echo -e "${YEL_BG}Bonus tests${END}"
 
@@ -640,7 +638,7 @@ echo -e "${BLU_BG}Bonus multi cmds:${END}"
 
 echo -ne "Test 1 : ./${pipex_bonus} Makefile cat cat cat t2_output\t\t\t\t\t--> "
 touch t2_output
-./${pipex_bonus} "Makefile" "cat" "cat" "cat" "t2_output" >/dev/null 2>&1 
+./${pipex_bonus} "Makefile" "cat" "cat" "cat" "t2_output" >/dev/null 2>&1
 code=$(echo $?)
 diff Makefile t2_output >/dev/null 2>&1 && echo -ne "${GREEN}OK${END}" || echo -ne "${RED}KO${END}"
 [[ $code -eq 0 ]] && echo -e " ${GREEN}(+ return status == 0)${END}" || echo -e "${YEL}(- return status != 0)${END}"
@@ -672,7 +670,7 @@ code=$(echo $?)
 date | man env | cat | grep -i exit > t2_expected 2>/dev/null
 diff t2_expected t2_output >/dev/null 2>&1 && echo -ne "${GREEN}OK${END}" || echo -ne "${RED}KO${END}"
 [[ $code -eq 0 ]] && echo -e " ${GREEN}(+ return status == 0)${END}" || echo -e "${YEL}(- return status != 0)${END}"
-rm -f t2_* 
+rm -f t2_*
 
 echo -ne "Test 5 : ./${pipex_bonus} Makefile cat ls \"sleep 3\" date env ls outf \t\t\t--> "
 start_Z_nb=$(top -bn1 | head -n2 | egrep -o "[0-9]* zombie$" | egrep -o "[0-9]*")
@@ -692,7 +690,7 @@ leaks=$(cat vlg.txt | grep -A 1 "HEAP SUMMARY" | tail -n1 | grep -o "[0-9]* byte
 fd=$(cat vlg.txt | grep -o  "Open file descriptor [0-9]*:" | sort | uniq | wc -l | tr -d "[:blank:]")
 main_fd_open=$(cat vlg.txt | grep -m7 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* open" | egrep -o "[0-9]*")
 main_fd_std=$(cat vlg.txt | grep -m7 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* std" | egrep -o "[0-9]*")
-main_fd=$(( $main_fd_open - $main_fd_std ))
+main_fd=$(( main_fd_open - main_fd_std ))
 [[ $leaks -eq 0 ]] && echo -ne "${GREEN}no leak${END}" || echo -ne "${RED}$leaks leaks${END}"
 [[ $fd -eq 0 ]] && echo -ne "${GREEN} - no extra fd (main+child)${END}" || echo -ne "${YEL} - $fd extra fd (main+child)${END}"
 [[ $main_fd -eq 0 ]] && echo -e "${GREEN} - no extra fd on main${END}" || echo -e "${RED} - $fd extra fd on main${END}"
@@ -757,7 +755,7 @@ main_proc=$(cat vlg.txt | grep -m4 -A 1 "HEAP SUMMARY" | tail -n1 | egrep -o "[0
 fd=$(cat vlg.txt | grep -o  "Open file descriptor [0-9]*:" | sort | uniq | wc -l | tr -d "[:blank:]")
 main_fd_open=$(cat vlg.txt | grep -m4 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* open" | egrep -o "[0-9]*") # -m4 (not m3) if process fork for heredoc
 main_fd_std=$(cat vlg.txt | grep -m4 "FILE DESCRIPTORS:" | tail -n1 | egrep -o "[0-9]* std" | egrep -o "[0-9]*")
-main_fd=$(( $main_fd_open - $main_fd_std ))
+main_fd=$(( main_fd_open - main_fd_std ))
 [[ $first_proc -eq 0 ]] && echo -ne "${GREEN}no leak cat${END}" || echo -ne "${RED}$first_proc leaks  cat${END}"
 [[ $second_proc -eq 0 ]] && echo -ne "${GREEN} - no leak cat${END}" || echo -ne "${RED} - $second_proc leaks cat${END}"
 [[ $main_proc -eq 0 ]] && echo -ne "${GREEN} - no leak main${END}" || echo -ne "${RED} - $main_proc leaks main${END}"
@@ -806,7 +804,7 @@ rm -f outf*
 echo -ne "Test 4 : ./pipex Makefile cat \"echo ''yo'\" outf \t\t\t--> "
 ./pipex Makefile "cat" "echo ''yo'" outf 2>/dev/null
 code=$(echo $?)
-echo outf | grep -q yo && echo -ne "${RED}KO (odd nb of quotes) ${END}" || echo -ne "${GREEN}OK ${END}" 
+echo outf | grep -q yo && echo -ne "${RED}KO (odd nb of quotes) ${END}" || echo -ne "${GREEN}OK ${END}"
 [[ $code -ne 0 ]] && echo -e "${GREEN}(return status != 0)${END}" || echo -e "${YEL}(return status == 0)${END}"
 rm -f outf*
 
